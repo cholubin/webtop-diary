@@ -32,6 +32,8 @@
     <%= f.file_field :file %>
   </p>
 
+<!-- <input type="button" value="test" id="test"> -->
+
 <% if TEMPLATE_OPEN_FUNC_TOGGLE == true %>
 	<br><br>
 	  <h1>사용자 공개설정 ================</h1>
@@ -125,6 +127,10 @@ $('#temp_submit').click(function(){
 		loadingView();	
 	}
 	
+})
+
+$('#test').click(function(){
+	loadingView();	
 })
 
 </script>

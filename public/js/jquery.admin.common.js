@@ -1,9 +1,8 @@
 function loadingView() {
 	var loadingStatus = null;
-	
 	if($("#modal-bg").length == 0) {
 		$("<div id='modal-bg'><img id='loading-icon' src='/images/default/loading.gif' width='91' height='120' alt='로딩이미지'/></div>")
-		.css({'display':'block','background-color': 'black', 'position': 'absolute', 'top': '0', 'left': '0','z-index':'10000'})
+		.css({'display':'block','background-color': 'black', 'position': 'absolute', 'top': '0', 'left': '0','z-index':'10'})
 		.appendTo('body')
 	}
 	if(!loadingStatus) {
@@ -12,7 +11,7 @@ function loadingView() {
 		startY = ($(window).height()/2)-(120/2)+$(document).scrollTop();
 		$("#loading-icon").css({"position": "absolute","top":startY,"left":startX}).show()
 		$("#modal-bg")
-			.css({"width": "100%","min-width":"960px", "height": $(document).height()})
+			.css({"width": "100%","min-width":"960px",'z-index':'10000', "height": $(document).height()})
 			.stop().fadeTo(0,"0.5")
 	} else {
 		if(popupStatus) {
