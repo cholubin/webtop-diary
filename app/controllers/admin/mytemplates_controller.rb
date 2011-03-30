@@ -115,7 +115,12 @@ class Admin::MytemplatesController < ApplicationController
   end
 
   def publish
-    press_mark = "YES"
+    if params[:mark] == "y"
+      press_mark = "YES"
+    else
+      press_mark = "NO"
+    end
+    
     
     @mytemplate = Mytemplate.get(params[:id].to_i)   
     erase_job_done_file(@mytemplate)       

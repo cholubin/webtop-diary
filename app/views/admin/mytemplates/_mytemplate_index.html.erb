@@ -155,11 +155,17 @@
 <script language="Javascript">
 $('.pdf_create').live("click", function(event){
 	var $id = $(this).attr("id");
-	
+	var $mark;
 	if( window.confirm("PDF를 생성하시겠습니까? \n기존에 생성한 파일은 덮어쓰게 됩니다!")){
 		$('#'+$id).attr("src","/images/admin/spin.gif")
+		if( window.confirm("인쇄마크를 포함하려면 [확인]을, 포함하지 않으려면 [취소]버튼을 클릭해주세요! ")){
+			$mark = "y";
+		}else{
+			$mark = "n";
+		}
+		
 		$.ajax({
-			data:'id='+$id, 
+			data:'id='+$id+'&mark='+$mark, 
 			dataType:'script', 
 			type:'post', 
 			url:'/admin/mytemplates/publish',
@@ -173,6 +179,7 @@ $('.pdf_create').live("click", function(event){
 				}
 			}
 		});
+		
 	}else{
 		return false;
 	}
