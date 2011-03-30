@@ -1,3 +1,35 @@
+function loadingView() {
+	var loadingStatus = null;
+	
+	if($("#modal-bg").length == 0) {
+		$("<div id='modal-bg'><img id='loading-icon' src='/images/default/loading.gif' width='91' height='120' alt='로딩이미지'/></div>")
+		.css({'display':'block','background-color': 'black', 'position': 'absolute', 'top': '0', 'left': '0','z-index':'10000'})
+		.appendTo('body')
+	}
+	if(!loadingStatus) {
+		loadingStatus = "view";
+		startX = ($(document).width()/2)-(91/2);
+		startY = ($(window).height()/2)-(120/2)+$(document).scrollTop();
+		$("#loading-icon").css({"position": "absolute","top":startY,"left":startX}).show()
+		$("#modal-bg")
+			.css({"width": "100%","min-width":"960px", "height": $(document).height()})
+			.stop().fadeTo(0,"0.5")
+	} else {
+		if(popupStatus) {
+			if(loadingStatus == "view") {
+				loadingStatus = "top";
+				$("#modal-bg").css("z-index","130");	
+			} else {
+				loadingStatus = "view";
+				$("#modal-bg").css("z-index","10");
+			}
+		} else {
+			loadingStatus = null;
+			$("#modal-bg").stop().fadeOut(0,function() {$("#loading-icon").hide();});
+		}
+	}
+}
+
 function to_comma(price){
 	char_price = price;
 	// 콤마찍기

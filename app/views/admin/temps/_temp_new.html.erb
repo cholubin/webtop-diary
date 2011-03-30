@@ -64,8 +64,9 @@
 	</table>
 <% end %>
 <p>
-  <%= f.submit 'Create' %>
+  <%= f.submit '업로드' %>
 </p>
+
 
 <% end %>
 
@@ -94,9 +95,7 @@ $(document).ready(function(){
 	});
 });	 
 
-</script>
 
-<script>
 function result2(){
 <% if TEMPLATE_OPEN_FUNC_TOGGLE == true %>	
 	var s2_length = $("#s2 option").length;
@@ -117,5 +116,15 @@ function result2(){
 <% end %>	
   	return true;
 }
+
+$('#temp_submit').click(function(){
+	if($('#temp_file').val() == ""){
+		alert("업로드 하실 템플릿은 반드시 선택해야 합니다!")
+		return false;
+	}else{
+		loadingView();	
+	}
+	
+})
 
 </script>

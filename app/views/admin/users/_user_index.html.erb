@@ -19,7 +19,7 @@
 	            <td class="board_thead" width="60px"><center>아이디</center></td>
 				<td class="board_thead" width="60px"><center>이름</center></td>
 	            <td class="board_thead" width="80px"><center>이메일</center></td>
-				<td class="board_thead" width="80px"><center>소속</center></td>
+				<!-- <td class="board_thead" width="80px"><center>소속</center></td> -->
 	            <td class="board_thead" width="100px"><center>연락처</center></td>
 				<td class="board_thead" width="80px"><center>비밀번호</center></td>
 				<td class="board_thead" width="30px"><center class="check_all" style="cursor:hand;">선택</center></td>
@@ -41,7 +41,7 @@
 	            <td class="board_tbody" width="60px" onClick="location.href='/admin/users/<%= user.id.to_s %>'" style="cursor:hand;"><center><%= user.userid %></center></td>
 				<td class="board_tbody" width="60px" onClick="location.href='/admin/users/<%= user.id.to_s %>'" style="cursor:hand;"><center><%= user.name %></center></td>
 	            <td class="board_tbody" width="80px" onClick="location.href='/admin/users/<%= user.id.to_s %>'" style="cursor:hand;"><center><%= user.email %></center></td>
-				<td class="board_tbody" width="80px" onClick="location.href='/admin/users/<%= user.id.to_s %>'" style="cursor:hand;"><center><%= user.group1 %><br><%= user.group2 %></center></td>
+				<!-- <td class="board_tbody" width="80px" onClick="location.href='/admin/users/<%= user.id.to_s %>'" style="cursor:hand;"><center><%= user.group1 %><br><%= user.group2 %></center></td> -->
 	            <td class="board_tbody" width="100px" onClick="location.href='/admin/users/<%= user.id.to_s %>'" style="cursor:hand;"><center><%= user.tel %><br><%= user.mobile %></center></td>	
 				<td class="board_tbody" width="80px" ><center><input type="button" class="init_btn" id="init_<%= user.id %>" value="비밀번호 초기화" style="cursor:pointer;"></center></td>
 				<td class="board_tbody" width="30px"><center><input type="checkbox" class="chk_box" name="chk[<%= user.id %>]"></center></td>
@@ -79,7 +79,7 @@
 					    	<option value="userid" 	<%="selected" if params[:keyword] == "userid"%>	>아이디</option>
 							<option value="name" 	<%="selected" if params[:keyword] == "name"	%>	>이름</option>
 							<option value="email" 	<%="selected" if params[:keyword] == "email"%> 	>이메일</option>
-							<option value="group" 	<%="selected" if params[:keyword] == "group"%> 	>소속</option>
+							<!-- <option value="group" 	<%="selected" if params[:keyword] == "group"%> 	>소속</option> -->
 							<option value="tel" 	<%="selected" if params[:keyword] == "tel"	%> 	>연락처</option>
 					    </select>
 						<%= text_field_tag :search, params[:search] %><%= image_submit_tag("/images/board/search.jpg", :align => "absmiddle") %>	
