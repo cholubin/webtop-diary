@@ -1,0 +1,7 @@
+카테고리:<select id="category_select">
+	<option value="all">전체</option>
+	<% @categories.each do |cat| %>
+	<option value="<%= cat.id%>" <%= "selected" if params[:cate].to_i == cat.id %>><%= cat.name %></option>
+	<%end %>
+	<!-- </select><input type="button" value="카테고리관리" style="cursor:pointer;" onClick="location.href='/admin/imgcategories'"> -->
+	</select><input id="btn_category" type="button" value="카테고리관리" style="cursor:pointer;">

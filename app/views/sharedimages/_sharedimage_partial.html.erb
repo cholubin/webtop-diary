@@ -1,0 +1,60 @@
+<% temp = 1 %>	
+<% @myimages.each do |myimage| %>
+<% if temp%4 == 1%>
+	<div>
+	<img src="/images/mytemplates/line.jpg">
+	</div>
+		<table>
+			<tr>
+<% end %>					
+				<td>
+					<!-- <템플릿 정보 반복 구간입니다.> -->
+					<table class="template_table">
+						<tr><td><input type="checkbox" name="chk[]" value="<%= myimage.id %>"></td></tr>
+						<td class="templatelist" width="180">
+							<a title="<%= myimage.description if !myimage.description.nil? %>" href="/myimages/<%= myimage.id.to_s %>?folder=<%= params[:folder] %>&ext=<%=ext%>&page=<%= params[:page] %>">
+								<%
+								if params[:folder] != nil and params[:folder] != ""
+									if params[:folder] != "all"
+										folder = Folder.get(params[:folder].to_i).name
+									end
+								end
+								%>
+								<%= image_tag myimage.thumb_url, :border=>'0'  %>
+							</a>
+						</td>
+						<td width="14">&nbsp;</td></tr>
+						<tr>
+						<td>&nbsp;</td></tr>
+						<tr> 
+						<td class="templatelist">
+							<%
+							if myimage.name.length > 15
+								image_name = myimage.name[0,15] 
+							else  
+								image_name = myimage.name 
+							end  
+							%>
+							<a href="/myimages/<%= myimage.id.to_s %>?folder=<%= params[:folder] %>&ext=<%=ext%>&page=<%= params[:page] %>"><%= image_name %></a>
+						</td></tr>
+						<tr> 
+						<td class="templatelist"><font color="white">등록일: <%= myimage.created_at.strftime('%Y-%m-%d') %></font></td></tr>
+						<tr>
+						<td class="templatelist">
+							<%#= link_to '삭제', myimage_path(myimage.id.to_s), :confirm => '정말 삭제하시겠습니까?', :method => :delete %>
+							<%= link_to image_tag("/images/template/delete_s.jpg", :border=>0), myimage_path(myimage.id.to_s), :confirm => '정말 삭제하시겠습니까?', :method => :delete %>
+						</td>
+						</tr>
+
+						<tr>
+						<td>&nbsp;</td></tr>
+					</table>
+					<!-- <템플릿 정보 반복 구간입니다.> -->
+				</td>
+<% if temp%4 == 0 or temp == @myimages.length%>
+			</tr>
+		</table>
+<% end  %>
+
+<% temp += 1
+end%>

@@ -1,0 +1,123 @@
+<%= stylesheet_link_tag '/css/paginate.css' %>
+<div id="feature_wrapper">
+		<p1>사용자들이 업로드한 이미지들 입니다.</p1>
+		<% if ! flash[:notice].nil? %>
+			<br>
+			<span class="error_message_small"><%= flash[:notice].to_s %></span>
+		<% end %>		
+<br><br>
+
+	</div>
+	
+	<% form_tag :action => :deleteSelection, :method => 'post' do %>			
+	<input type="hidden" id="all_checked" value="false">
+	<% 	
+		
+	   	if params[:ext] == nil or params[:ext] == "" or params[:ext] == "all"
+			ext = "all"
+		else
+			ext = params[:ext]
+		end
+
+		if params[:share] != nil and params[:share] != "" and params[:share] != "all"
+			share = params[:share]
+		else
+			share = "all"
+		end
+	%>
+
+	<div align="right" style="padding:0 175 5 0">
+		공유: <select name="_share" onChange="location.href='/admin/myimages?ext=<%= params[:ext] %>&share='+document.all._share.value;">
+			<option value="all" <%= "selected" if share == "all" %>>전체</option>				
+			<option value="y" <%= "selected" if share == "y" %>>공유중</option>				
+			<option value="n" <%= "selected" if share == "n" %>>비공유</option>				
+		</select>
+		
+		확장자별: <select name="_ext" onChange="location.href='/admin/myimages?share=<%= params[:share] %>&ext='+document.all._ext.value;">
+			<option value="all" <%= "selected" if ext == "all" %>>전체</option>				
+			<%@exts.each do |ex| %>
+				<option value="<%= ex.downcase %>" <%= "selected" if ext.downcase == ex.downcase %>><%= ex.upcase %></option>							
+			<%end %>
+		</select>	
+	</div>
+	
+	
+	<table class="board_table">
+	    <thead class="board_thead">
+	        <tr>
+	            <th class="board_thead" width="60px">번호 </th>
+	            <td class="board_thead" width="100px"><center>썸네일</center></td>
+				<td class="board_thead" width="80px"><center>제목</center></td>
+	            <td class="board_thead" width="80px"><center>사용자 아이디 </center></td>
+	            <td class="board_thead" width="65px"><center>사용자 이름</center></td>
+				<td class="board_thead" width="30px"><center class="check_all" style="cursor:hand;">선택</center></td>
+	        </tr>
+	    </thead>
+	 
+	    <tbody class="board_tbody">
+			<% 	if params[:page].to_i == 0 or params[:page].to_i == 1
+					@temp_page = 0
+				else
+					@temp_page = params[:page].to_i - 1
+				end
+				@page_num = @total_count - (12 * @temp_page) %>
+				
+			<%puts_message @myimages.count.to_s %>
+			<% @myimages.each do |myimage| %>
+	        <tr class="table_b","board_tbody">
+	            <th class="board_tbody" width="60px"><%= @page_num %></th>
+	            <td class="board_tbody" width="1px">
+					<center>
+					<a href="/admin/myimages/<%= myimage.id.to_s%>?search=<%=params[:search]%>&page=<%=params[:page]%>"><%=image_tag myimage.thumb_url %></a>
+					</center>
+				</td>
+				<td class="board_tbody" width="80px"><center><%= myimage.name %></center></td>
+				<td class="board_tbody" width="80px"><center><%= User.first(:id => myimage.user_id).userid %></center></td>
+	            <td class="board_tbody" width="80px"><center><%= User.first(:id => myimage.user_id).name %></center></td>
+				<td class="board_tbody" width="30px"><center><input type="checkbox" class="chk_box" name="chk[<%= myimage.id %>]"></center></td>
+	        </tr>
+	        <% @page_num -= 1
+			end %>
+	        
+	    </tbody>
+	</table>
+	   
+
+	<div id="line_bottom1"></div>
+	<br>
+
+		<!-- dm-pager Pagination -->
+		<table width="730" >
+			<tr>
+				<td width="230">&nbsp;</td>
+				<td width="350" style="align:center">
+					<div class="pager">
+					<%if params[:ext] != nil and params[:ext] != "" and params[:ext] != "all"%>
+						<%= Myimage.all(:type => params[:ext]).search_user(params[:search], params[:page]).pager.to_html "/admin/myimages?search=#{params[:search]}" %>
+					<%else %>
+						<%= Myimage.search_user(params[:search], params[:page]).pager.to_html "/admin/myimages?search=#{params[:search]}" %>
+					<%end %>
+					</div>
+				</td>
+				<td width="150" align="right">
+					<% if @total_count > 0 %>
+						<%= image_submit_tag('/images/board/delete.jpg', { :onclick => 'return confirm(\'정말 삭제하시겠습니까?\');' }) %>				
+					<% end %>
+				</td>
+			</tr>
+			<% end %>
+			<tr height="10">
+				<td align="center" colspan="3">
+					<% if @total_count > 0 %>
+						<% form_tag request.path + "?page=#{params[:page]}", :method => 'get' do %>								
+					    <%= text_field_tag :search, params[:search] %><%= image_submit_tag("/images/board/search.jpg", :align => "absmiddle") %>	
+						<% end %>
+					<% end %>
+				</td>
+			</tr>
+					
+		</table>
+		
+
+
+

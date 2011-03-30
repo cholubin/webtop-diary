@@ -1,0 +1,12 @@
+<% 
+@categories.each do |cat| %>
+ 	<h3><a class="<%= "on" if params[:cate] == cat.id.to_s %>" href="/ebooks?cate=<%= cat.id %>"><%= cat.name %></a></h3>
+	<p>
+	  <% @subcategories = cat.subcategories  %>
+	  <% @subcategories.each do |subcat| %>
+			<a class="<%= "on" if @subcategory.to_s == subcat.id.to_s and @category.to_s == cat.id.to_s %>" href="/ebooks?cate=<%= cat.id %>&subcate=<%= subcat.id %>">&nbsp;&nbsp;-&nbsp;<%= subcat.name %></a> <br>  		
+
+	  <%end%>
+	</p>
+	
+<%end%>

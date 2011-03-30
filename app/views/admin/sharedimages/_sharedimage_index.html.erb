@@ -1,0 +1,277 @@
+<%= stylesheet_link_tag '/css/paginate.css' %>
+<div id="feature_wrapper">
+		<p1>사용자들에게 공개하는 이북 입니다.</p1>
+		<% if ! flash[:notice].nil? %>
+			<br>
+			<span class="error_message_small"><%= flash[:notice].to_s %></span>
+		<% end %>		
+<br><br>
+
+	</div>
+	<p>
+		<div id="categories">
+		카테고리:<select id="category_select">
+			<option value="all">전체</option>
+			<% @categories.each do |cat| %>
+			<option value="<%= cat.id%>" <%= "selected" if params[:cate].to_i == cat.id %>><%= cat.name %></option>
+			<%end %>
+			<!-- </select><input type="button" value="카테고리관리" style="cursor:pointer;" onClick="location.href='/admin/imgcategories'"> -->
+			</select><input id="btn_category" type="button" value="카테고리관리" style="cursor:pointer;">
+		</div>
+	  <p/>
+	
+		<div id="category_section" status="off" style="margin-left:-100"></div>
+	
+	<% form_tag :action => :deleteSelection, :method => 'post' do %>			
+	<input type="hidden" id="all_checked" value="false">
+
+	<table class="board_table">
+	    <thead class="board_thead">
+	        <tr>
+	            <th class="board_thead" width="60px">번호 </th>
+	            <td class="board_thead" width="100px"><center>썸네일</center></td>
+				<td class="board_thead" width="80px"><center>제목</center></td>
+	            <td class="board_thead" width="180px"><center>카테고리</center></td>
+	            <td class="board_thead" width="100px"><center>공개여부</center></td>
+				<td class="board_thead" width="30px"><center class="check_all" style="cursor:hand;">선택</center></td>
+	        </tr>
+	    </thead>
+	 
+	    <tbody class="board_tbody">
+			<% 	if params[:page].to_i == 0 or params[:page].to_i == 1
+					@temp_page = 0
+				else
+					@temp_page = params[:page].to_i - 1
+				end
+				@page_num = @total_count - (12 * @temp_page) %>
+				
+			<% 	@sharedimages.each do |sharedimage| 
+			   		cate_name = Category.get(sharedimage.category).name
+			   		if sharedimage.subcategory != nil and sharedimage.subcategory != ""
+			   			subcate_name = "/" + Subcategory.get(sharedimage.subcategory).name
+					else
+						subcate_name = ""
+					end
+			   		cate_name_string = cate_name + subcate_name
+			%>
+	        <tr class="table_b","board_tbody">
+	            <th class="board_tbody" width="60px"><%= @page_num %></th>
+	            <td class="board_tbody" width="1px">
+					<center>
+					<a href="/admin/sharedimages/<%= sharedimage.id.to_s%>?search=<%=params[:search]%>&page=<%=params[:page]%>"><%=image_tag sharedimage.thumb_url %></a>
+					</center>
+				</td>
+				<td class="board_tbody" width="80px"><center><span class="subject" id="subject_<%= sharedimage.id %>" style="cursor:pointer;"><%= sharedimage.name %></span></center></td>
+				<td class="board_tbody" width="180px">
+					<!-- <center><%= cate_name_string %></center> -->
+					<center>
+						<select class="select_category" id="select_category_<%= sharedimage.id %>">
+							<% Category.all(:gubun => "image", :order => [:priority]).each do |cat| %>
+							<option value="<%= cat.id %>" <%= "selected" if sharedimage.category == cat.id %>><%= cat.name %></option>
+							<%end %>
+						</select><br>
+						<div id="subcategories_<%= sharedimage.id %>">
+						<select class="select_subcategory" id="select_subcategory_<%= sharedimage.id %>">
+							<% Subcategory.all(:category_id => sharedimage.category, :order => [:priority]).each do |subcat| %>
+							<option value="<%= subcat.id %>" <%= "selected" if sharedimage.subcategory == subcat.id %>><%= subcat.name %></option>
+							<%end %>
+						</select>
+						</div>
+					</center>
+				</td>
+				<% 
+					if sharedimage.open_fl == true 
+						shared_status = "공개" 
+				   	else
+						shared_status = "비공개" 
+					end
+					
+				%>
+	            <td class="board_tbody" width="100px"><center><input style="cursor:pointer;" type="button" class="change_btn" id="change_<%= sharedimage.id %>" value="<%= shared_status %>"></center></td>
+				<td class="board_tbody" width="30px"><center><input type="checkbox" class="chk_box" name="chk[<%= sharedimage.id %>]"></center></td>
+	        </tr>
+	        <% @page_num -= 1
+			end %>
+	        
+	    </tbody>
+	</table>
+	   
+
+	<div id="line_bottom1"></div>
+	<br>
+
+		<!-- dm-pager Pagination -->
+		<table width="730" >
+			<tr>
+				<td width="230">&nbsp;</td>
+				<td width="350" style="align:center">
+					<div class="pager">
+					<%if params[:ext] != nil and params[:ext] != "" and params[:ext] != "all"%>
+						<%= Sharedimage.all(:type => params[:ext]).search_user(params[:search], params[:page]).pager.to_html "/admin/sharedimages?search=#{params[:search]}" %>
+					<%else %>
+						<%= Sharedimage.search_user(params[:search], params[:page]).pager.to_html "/admin/sharedimages?search=#{params[:search]}" %>
+					<%end %>
+					</div>
+				</td>
+				<td width="150" align="right">
+					<% if @total_count > 0 %>
+						<%= image_submit_tag('/images/board/delete.jpg', { :onclick => 'return confirm(\'정말 삭제하시겠습니까?\');' }) %>
+					<% end %>
+						<img src="/images/admin/upload.jpg" style="cursor:pointer;" onClick="location.href='/admin/sharedimages/new'">
+				</td>
+			</tr>
+			<% end %>
+			<tr height="10">
+				<td align="center" colspan="3">
+					<% if @total_count > 0 %>
+						<% form_tag request.path + "?page=#{params[:page]}", :method => 'get' do %>								
+					    <%= text_field_tag :search, params[:search] %><%= image_submit_tag("/images/board/search.jpg", :align => "absmiddle") %>	
+						<% end %>
+					<% end %>
+				</td>
+			</tr>
+					
+		</table>
+		
+<div id="category_section">
+</div>
+
+<script language="Javascript">
+$(document).ready(function(){
+	$('#category_section').hide();
+	$('#category_section').load("/admin/imgcategories", function(){
+		$('#category_section #admincontents_wrapper #admin #admin_top').remove();
+
+	});
+})
+
+$('#category_select').live("change", function(){
+	location.href = "/admin/sharedimages?cate=" + $('#category_select :selected').val() + '&share=<%= params[:share] %>';
+})
+
+$('.change_btn').live("mouseover", function(){
+	$(this).attr("origin_value",$(this).val());
+	if($(this).val() == "공개"){
+		$(this).attr("value","비공개로 변경");
+	}else{
+		$(this).attr("value","공개로 변경");
+	}
+	$(this).css("color", "blue");
+	
+})
+
+$('.change_btn').live("mouseout", function(){
+	$(this).attr("value",$(this).attr("origin_value"));	
+	$(this).css("color", "black");
+})
+
+$('.subject_input').live("keydown", function(event){
+	if(event.keyCode == 13){
+		$('.subject_input').blur();
+		return false;
+	}
+})
+
+$('.change_btn').live("click", function(){
+	var $id = $(this).attr("id").replace("change_","");
+	
+	$.ajax({
+		data:'id='+ $id, 
+		dataType:'script', 
+		type:'post', 
+		url:'/admin/sharedimages/change_open_status',
+		success: function(request){
+			if(request == "success"){
+				if($('#change_'+$id).attr("origin_value") == "공개"){
+					$('#change_'+$id).fadeOut("slow", function(){
+						$(this).attr("origin_value","비공개");
+						$(this).attr("value","비공개");
+					}).fadeIn("slow");
+					
+				}else{
+					$('#change_'+$id).fadeOut("slow", function(){
+						$(this).attr("origin_value","공개");
+						$(this).attr("value","공개");
+					}).fadeIn("slow");
+				}
+			}else{
+				alert("상태변경에 실패했습니다!\n관리자에게 문의하여 주십시오!");
+			}
+			
+		}
+	});
+})
+$('.subject_input').live("blur", function(){
+	var $id = $(this).attr("id").replace("input_","");
+	var $str = $(this).val();
+	
+	$.ajax({
+		data:'id='+ $id + '&str=' + $str, 
+		dataType:'script', 
+		type:'post', 
+		url:'/admin/sharedimages/change_subject',
+		success: function(request){
+			if(request == "success"){
+				$('#subject_'+$id).text($str);
+				$('#subject_'+$id).attr("class","subject");
+			}else{
+				alert("실패!");
+			}
+		}
+	});
+})
+
+$('.subject').live("click", function(){
+	var $id = $(this).attr("id").replace("subject_","");
+	$(this).html("<input type='text' class='subject_input' id='"+"input_" + $id +"' value='"+$(this).text()+"'>");
+	
+	$(this).attr("class","subject_edit");
+	$('#input_'+$id).focus();
+})
+
+
+$('.select_category').live("change",function(){
+	var $id = $(this).attr("id").replace("select_category_","");
+	var $value = $(this,'option:selected').val();
+	
+	$.ajax({
+		data:'id='+ $id + '&value=' + $value, 
+		dataType:'script', 
+		type:'post', 
+		url:'/admin/sharedimages/category_change_update'
+	});
+})
+
+$('.select_subcategory').live("change",function(){
+	var $id = $(this).attr("id").replace("select_subcategory_","");
+	var $value = $(this,'option:selected').val();
+	
+	$.ajax({
+		data:'id='+ $id + '&value=' + $value, 
+		dataType:'script', 
+		type:'post', 
+		url:'/admin/sharedimages/subcategory_change_update'
+	});
+})
+
+$('#btn_category').live("click", function(){
+	if( $('#category_section').attr("status") == "off"){
+		$('#category_section').show("slow");
+		$('#category_section').attr("status","on");
+		$('#btn_category').val("카테고리관리 닫기");
+	}else{
+		$('#category_section').hide("slow");
+		$('#category_section').attr("status","off");
+		$('#btn_category').val("카테고리관리");
+		
+		$.ajax({
+			dataType:'script', 
+			type:'post', 
+			url:'/admin/sharedimages/category_update'
+		});
+		
+		window.status = "카테고리 정보가 업데이트 되었습니다!"
+		setTimeout(function(){window.status=""}, 3000);
+	}
+})
+</script>

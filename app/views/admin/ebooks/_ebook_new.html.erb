@@ -1,0 +1,64 @@
+<style>
+#layer1{border:0px solid green;position:absolute; left:400px; top:50px;width:100;height:100px; z-index:99999;}
+</style>
+
+<div id="layer1" style="display:none;"><%= image_tag("/images/template/loading.gif", :width => '100') %></div>
+
+
+<h1>이북 업로드</h1>
+
+<% form_for(:ebook, :url => admin_ebooks_path, :html => {:multipart => true}) do |f| %>	
+  <%= f.error_messages %>
+
+  <p>
+	<%= javascript_include_tag :defaults %>	
+	카테고리:<%= collection_select :ebook, :category, @categories, :id, :name, 
+						 {:selected   => "1"}, 
+						 {:onchange => "#{remote_function(:url  => {:action => "update_subcategories"},:with => "'category_id='+value")}"} %>
+	<span id="subcategories">
+	<% if Subcategory.all(:category_id => Category.first(:gubun => "ebook", :order => [:priority]).id).count > 0 %>
+	<%= render :partial => 'subcategories', :object => Subcategory.all(:category_id => Category.first(:gubun => "ebook", :order => [:priority]).id) %>
+	<%end %>
+	</span>
+	<input type="button" value="카테고리관리" style="cursor:pointer;" onClick="location.href='/admin/imgcategories'">	
+  <p/>	
+
+  <p>
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </p>
+ <p>
+    <%= f.label :'이북 업로드' %><br />
+    <%= f.file_field :ebook_file %>
+  </p>
+  <p>
+    <%= f.submit '이북 업로드' %>
+  </p>
+<% end %>
+
+<%= link_to '목록', "/admin/ebooks" %>
+
+
+<script Lnaguage="Javascript">
+$('#ebook_submit').click(function(){
+	show_progress();
+})
+
+function show_progress() {
+	var width = 100;
+	var height = 100;
+	
+	var left = (screen.width - width)/2;
+ 	var top = (screen.height - height)/2;
+	
+	document.getElementById("layer1").style.left = left;
+	document.getElementById("layer1").style.top = top;
+	
+	document.getElementById("layer1").style.display = "block";		
+
+}
+
+function hide_progress() {
+	document.getElementById("layer1").style.display = "none";		
+}
+</script>

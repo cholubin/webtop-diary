@@ -1,0 +1,113 @@
+
+<%= stylesheet_link_tag '/css/paginate.css' %>
+<div id="feature_wrapper">
+		<p1>가입한 사용자들의 정보입니다.</p1>
+		<% if ! flash[:notice].nil? %>
+			<br>
+			<span class="error_message_small"><%= flash[:notice].to_s %></span>
+		<% end %>		
+<br><br>
+
+	</div>
+	
+	<% form_tag :action => :deleteSelection, :method => 'post' do %>			
+	<input type="hidden" id="all_checked" value="false">
+	<table class="board_table">
+	    <thead class="board_thead">
+	        <tr>
+	            <th class="board_thead" width="60px">번호 </th>
+	            <td class="board_thead" width="60px"><center>아이디</center></td>
+				<td class="board_thead" width="60px"><center>이름</center></td>
+	            <td class="board_thead" width="80px"><center>이메일</center></td>
+				<td class="board_thead" width="80px"><center>소속</center></td>
+	            <td class="board_thead" width="100px"><center>연락처</center></td>
+				<td class="board_thead" width="80px"><center>비밀번호</center></td>
+				<td class="board_thead" width="30px"><center class="check_all" style="cursor:hand;">선택</center></td>
+	        </tr>
+	    </thead>
+	 
+	    <tbody class="board_tbody">
+			<% 	if params[:page].to_i == 0 or params[:page].to_i == 1
+					@temp_page = 0
+				else
+					@temp_page = params[:page].to_i - 1
+				end
+				@page_num = @total_count - (12 * @temp_page) %>
+				
+
+			<% @users.each do |user| %>
+	        <tr class="table_b","board_tbody">
+	            <th class="board_tbody" width="60px" onClick="location.href='/admin/users/<%= user.id.to_s %>'" style="cursor:hand;"><%= @page_num %></th>
+	            <td class="board_tbody" width="60px" onClick="location.href='/admin/users/<%= user.id.to_s %>'" style="cursor:hand;"><center><%= user.userid %></center></td>
+				<td class="board_tbody" width="60px" onClick="location.href='/admin/users/<%= user.id.to_s %>'" style="cursor:hand;"><center><%= user.name %></center></td>
+	            <td class="board_tbody" width="80px" onClick="location.href='/admin/users/<%= user.id.to_s %>'" style="cursor:hand;"><center><%= user.email %></center></td>
+				<td class="board_tbody" width="80px" onClick="location.href='/admin/users/<%= user.id.to_s %>'" style="cursor:hand;"><center><%= user.group1 %><br><%= user.group2 %></center></td>
+	            <td class="board_tbody" width="100px" onClick="location.href='/admin/users/<%= user.id.to_s %>'" style="cursor:hand;"><center><%= user.tel %><br><%= user.mobile %></center></td>	
+				<td class="board_tbody" width="80px" ><center><input type="button" class="init_btn" id="init_<%= user.id %>" value="비밀번호 초기화" style="cursor:pointer;"></center></td>
+				<td class="board_tbody" width="30px"><center><input type="checkbox" class="chk_box" name="chk[<%= user.id %>]"></center></td>
+	        </tr>
+	        <% @page_num -= 1
+			end %>
+	        
+	    </tbody>
+	</table>
+	   
+
+	<div id="line_bottom1"></div>
+	<br>
+
+		<!-- dm-pager Pagination -->
+		<table width="730" >
+			<tr>
+				<td width="30">&nbsp;</td>
+				<td width="550" style="align:left">
+					<div class="pager">
+					<%=@users.pager.to_html "/admin/users?keyword=#{params[:keyword]}&search=#{params[:search]}" %>
+					</div>
+				</td>
+				<td width="150" align="right">
+					<% if @total_count > 0 %>
+						<%= image_submit_tag('/images/board/delete.jpg', { :onclick => 'return confirm(\'정말 삭제하시겠습니까?\');' }) %>				
+					<% end %>
+				</td>
+			</tr>
+			<% end %>
+			<tr height="10">
+				<td align="center" colspan="3">
+						<% form_tag request.path + "?page=#{params[:page]}", :method => 'get' do %>								
+					    <select name="keyword">
+					    	<option value="userid" 	<%="selected" if params[:keyword] == "userid"%>	>아이디</option>
+							<option value="name" 	<%="selected" if params[:keyword] == "name"	%>	>이름</option>
+							<option value="email" 	<%="selected" if params[:keyword] == "email"%> 	>이메일</option>
+							<option value="group" 	<%="selected" if params[:keyword] == "group"%> 	>소속</option>
+							<option value="tel" 	<%="selected" if params[:keyword] == "tel"	%> 	>연락처</option>
+					    </select>
+						<%= text_field_tag :search, params[:search] %><%= image_submit_tag("/images/board/search.jpg", :align => "absmiddle") %>	
+						<% end %>
+				</td>
+			</tr>
+					
+		</table>
+		
+<script language="Javascript">
+$('.init_btn').live("click", function(){
+	var $id = $(this).attr("id").replace("init_","");
+	if(window.confirm("사용자의 비밀번호를 초기화 하시겠습니까?\n비밀번호는 1234 로 강제 초기화 됩니다!")){
+		$.ajax({
+			data:'id='+$id, 
+			dataType:'script', 
+			type:'post', 
+			url:'/admin/users/initialize_password',
+			success: function(request){
+				if(request == "success"){
+					alert("해당 사용자의 비밀번호가 1234로 초기화 되었습니다!");
+				}else{
+					alert("비밀번호 초기화에 실패했습니다.\n관리자에게 문의하여 주십시오!");
+				}
+			}
+		});
+	}else{
+		return false;
+	}
+})
+</script>		

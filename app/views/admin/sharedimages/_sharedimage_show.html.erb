@@ -1,0 +1,6 @@
+<div style="text-align:center;padding-right:100px;">	
+	<%= image_tag @sharedimage.url, :width => '600' %>
+	<p><b>이미지명:</b>  <%=h @sharedimage.name %><br></p>
+</div>
+
+<input type="button" style="cursor:hand;" value="목록" onClick="location.href='/admin/sharedimages'">

@@ -1,0 +1,190 @@
+<% 
+   if params[:cate] != nil; cate = params[:cate] else; cate = "" end
+   if params[:page] != nil; page = params[:page] else; page = "" end
+   if params[:search] != nil; search = params[:search] else; search = "" end
+   if params[:order] != nil; order = params[:order] else; order = "" end
+%>
+
+<link href="/css/paginate.css" media="screen" rel="stylesheet" type="text/css" />
+
+<%
+	if params[:userid] != nil
+		userid = params[:userid]
+		user = User.get(userid.to_i)
+	end
+ %>
+<div id="feature_wrapper">
+		<p1>사용들자들이 선택한 템플릿 관리 페이지 입니다.</p1><br>
+		<%if params[:userid] != nil and params[:userid] != ""%>
+			<p2><%= user.userid + "("+user.name+") 고객님의 템플릿입니다." if user.name != nil%><p2>
+		<%end %>
+		<% if ! flash[:notice].nil? %>
+			<br>
+			<span class="error_message_small"><%= flash[:notice].to_s %></span>
+		<% end %>		
+<br><br>
+
+	</div>
+	
+	<div align="right" style="padding:0 180 5 0">
+		<font color="white">주문상태</font> 
+		<span id="order_status_select">
+		<select name="_order_status" onChange="location.href='/admin/mytemplates?page=1&search=<%= params[:search] %>&cate=<%= params[:cate] %>&folder=<%= params[:folder] %>&order='+document.all._order_status.value;">
+			<option value="all" <%= "selected" if params[:order] == "all" %>>전체</option>				
+			<option value="y" <%= "selected" if params[:order] == "y" %>>주문중</option>				
+			<option value="n" <%= "selected" if params[:order] == "n" %>>비주문</option>						
+		</select>
+
+		<font color="white">메인분류 </font><select name="_cate" onChange="location.href='/admin/mytemplates?search=<%= params[:search] %>&order=<%= params[:order] %>&cate='+document.all._cate.value;">
+			<%  if @categories.length > 0 %>
+					<option value="all" <%= "selected" if cate == "all" %>>전체</option>						
+				<% @categories.each do |s| %>
+					<option value="<%= s.id %>" <%= "selected" if cate == s.id.to_s %>><%= s.name %></option>				
+				<%end%>
+			<%	else%>
+					<option value="">"먼저 메인분류를 추가하세요!"</option>					
+				<%end %>
+		</select>
+	</div>
+	
+	<% form_tag :action => :deleteSelection, :method => 'post' do %>			
+	<input type="hidden" id="all_checked" value="false">
+	
+	<table class="board_table">
+	    <thead class="board_thead">
+	        <tr>
+	            <th class="board_thead" width="40px"><center>번호</center></th>
+	            <td class="board_thead" width="120px"><center>썸네일</center></td>
+				<td class="board_thead" width="150px"><center>템플릿명</center></td>
+	            <td class="board_thead" width="150px"><center>카테고리/서브카테고리</center></td>
+	            <td class="board_thead" width="65px"><center>등록일</center></td>	
+				<td class="board_thead" width="80px"><center>소유자</center></td>
+				<td class="board_thead" width="80px"><center>PDF</center></td>
+				<td class="board_thead" width="30px"><center class="check_all" style="cursor:hand;">선택</center></td>				
+	        </tr>
+	    </thead>
+	 
+	    <tbody class="board_tbody">
+			<% 	if params[:page].to_i == 0 or params[:page].to_i == 1
+					@temp_page = 0
+				else
+					@temp_page = params[:page].to_i - 1
+				end
+				@page_num = @total_count - (6 * @temp_page) %>
+				
+
+			<% @mytemplates.each do |mytemplate| %>
+
+			<% temp_image_path = mytemplate.thumb_url  if mytemplate.thumb_url%>			
+			
+	        <tr class="table_b","board_tbody">
+	            <th class="board_tbody" width="40px"><%= @page_num %></th>
+	            <td class="board_tbody" width="120px"><center><a href="/admin/mytemplates/<%= mytemplate.id.to_s %>?search=<%= params[:search] %>&userid=<%= params[:userid] %>&page=<%= params[:page] %>"><%= "<img src='" + temp_image_path + "'>" if mytemplate.thumb_url %></a></center></td>
+				<td class="board_tbody" width="150px"><center><a href="/admin/mytemplates/<%= mytemplate.id.to_s %>?search=<%= params[:search] %>&userid=<%= params[:userid] %>&page=<%= params[:page] %>"><%= mytemplate.name %>(id: <%= mytemplate.id %>)</a></center></td>
+				<td class="board_tbody" width="150px"><center>
+					<%
+					if mytemplate.category != nil and mytemplate.subcategory != nil
+						if Category.get(mytemplate.category.to_i) == nil or Subcategory.get(mytemplate.subcategory.to_i) == nil
+							category_str = ""
+						else
+							category_str = Category.get(mytemplate.category.to_i).name + "/" + Subcategory.get(mytemplate.subcategory.to_i).name
+						end	
+					elsif mytemplate.category != nil and mytemplate.subcategory == nil
+						category_str = Category.get(mytemplate.category.to_i).name
+					else 
+						category_str = ""
+					end
+					%>
+					<%= category_str %></center>
+				</td>
+	            <td class="board_tbody" width="65px"><center><%= mytemplate.created_at.strftime('%Y-%m-%d') %></center></td>
+	            <td class="board_tbody" width="80px"><center><%= User.get(mytemplate.user_id).userid %><br>(<%= User.get(mytemplate.user_id).name %>)</center></td>
+				<td class="board_tbody" width="30px">
+					<%if mytemplate.order_fl == true %>
+					<center><img class="pdf_create" id="<%= mytemplate.id %>" src="/images/admin/pdf_create.jpg" style="cursor:pointer; margin:0 0 5 0">
+						<%
+						filename = mytemplate.id.to_s + "_" + User.get(mytemplate.user_id).userid + ".pdf"
+				    	basic_path = RAILS_ROOT + "/public/pdf_admin/" 
+						if File.exist?(basic_path + filename)
+						%>
+						<a href="/pdf_admin/<%= filename %>" target="new"><img class="pdf_download" id="dn_<%= mytemplate.id %>" src="/images/admin/pdf_download.jpg" style="cursor:pointer;"></a>
+						<%else %>
+						<a href="/pdf_admin/<%= filename %>" target="new"><img class="pdf_download" id="dn_<%= mytemplate.id %>" src="/images/admin/pdf_download.jpg" style="cursor:pointer;display:none"></a>
+						<%end %>
+						</center>
+					<%end %>
+					</td>
+				<td class="board_tbody" width="30px"><center><input type="checkbox" class="chk_box" name="chk[<%= mytemplate.id %>]"></center></td>
+	        </tr>
+	        <% @page_num -= 1
+			end %>
+	        
+	    </tbody>
+	</table>
+	   
+
+	<div id="line_bottom1"></div>
+	<br>
+
+		<!-- dm-pager Pagination -->
+		<table width="730" >
+			<tr>
+				<td width="230">&nbsp;</td>
+				<td width="350" style="align:center">
+					<div class="pager">
+						<%=@mytemplates.pager.to_html "/admin/mytemplates?order=#{order}&userid=#{params[:userid]}&search=#{params[:search]}" %>					
+					</div>
+				</td>
+				<td width="150" align="right">
+						<%= image_submit_tag('/images/board/delete.jpg', { :onclick => 'return confirm(\'정말 삭제하시겠습니까?\');' }) %>				
+				</td>
+			</tr>
+			<% end %>
+			<tr height="10">
+				<td align="center" colspan="3">
+						<% form_tag request.path + "?page=#{params[:page]}", :method => 'get' do %>								
+					    <%= text_field_tag :search, params[:search] %><%= image_submit_tag("/images/board/search.jpg", :align => "absmiddle") %>	
+						<% end %>
+				</td>
+			</tr>
+					
+		</table>
+		
+
+
+<script language="Javascript">
+$('.pdf_create').live("click", function(event){
+	var $id = $(this).attr("id");
+	
+	if( window.confirm("PDF를 생성하시겠습니까? \n기존에 생성한 파일은 덮어쓰게 됩니다!")){
+		$('#'+$id).attr("src","/images/admin/spin.gif")
+		$.ajax({
+			data:'id='+$id, 
+			dataType:'script', 
+			type:'post', 
+			url:'/admin/mytemplates/publish',
+			success: function(request){
+				$('#'+$id).attr("src","/images/admin/pdf_create.jpg");
+				if(request == "success"){
+					// alert("정상적으로 PDF를 생성했습니다.");
+					$('#dn_'+$id).css("display","block");
+				}else{
+					alert("PDF 생성에 실패했습니다. 관리자에게 문의해주시기 바랍니다!");
+				}
+			}
+		});
+	}else{
+		return false;
+	}
+});
+
+</script>
+
+
+
+
+
+
+
+
+

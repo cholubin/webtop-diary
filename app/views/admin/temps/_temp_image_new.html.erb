@@ -1,0 +1,22 @@
+<h1>새로운 이미지 업로드</h1>
+
+<% form_for @myimage,:url => admin_myimages_path, :html => {:multipart => true} do |f| %>
+  	<% if ! flash[:notice].nil? %>
+		<br>
+		<span class="error_message_small"><%= flash[:notice].to_s %></span>
+	<% end %>
+
+  <p>
+    <%= f.label :제목 %><br />
+    <%= f.text_field :name %>
+  </p>
+ <p>
+    <%= f.label :'이미지 업로드' %><br />
+    <%= f.file_field :image_file %>
+  </p>
+  <p>
+    <%= f.submit '업로드' %>
+  </p>
+<% end %>
+
+<a href="Javascript:history.back(-1);">목록으로 돌아가기</a>

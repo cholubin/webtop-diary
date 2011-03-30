@@ -1,0 +1,4 @@
+<ul id="nav">
+	<li><a <%= "Class='on'" if (@board == "category" and  @section == "index") %> href="/categories">템플릿 카테고리</a></li>
+	<li><a <%= "Class='on'" if (@board == "imgcategory" and @section == "index") %> href="/admin/imgcategories">이미지 카테고리</a></li>
+</ul>

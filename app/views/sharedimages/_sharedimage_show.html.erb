@@ -1,0 +1,44 @@
+<div id="admincontents_wrapper">
+<h2>클립아트 상세페이지</h2>
+<p2>자신이 직접 등록한 클립아트의 내용입니다. <br></p2>
+<br>
+</div>
+
+<table class="clipart_table">
+    <thead class="clipart_thead">
+        <tr>
+            <td class="clipart_thead" width="800px"><%=h @sharedimage.name %> </td>
+        </tr>
+    </thead>
+</table>
+
+<p>
+
+  
+</p>
+<div style="text-align:center">
+<a href="<%= @sharedimage.url %>" target="new">
+		<%= image_tag("#{@sharedimage.preview_url}", :width => '400') %>
+	</a>
+</div>
+
+<% if @sharedimage.description != nil && @sharedimage.description.length > 1 %>
+<p>
+  <b>설명:</b><br>
+  <%=h @sharedimage.description %>
+</p>
+<% end %>
+<p></p>
+<div>
+<img src="/images/mytemplates/line.jpg">
+</div>
+
+<p style="text-align:right;padding-right:30px;">
+<img src="/images/ourimage/download.jpg" style="cursor:pointer;" id="img_dn"> <%= link_to image_tag("/images/board/list.jpg", :border=>0), sharedimages_path + "?ext="+params[:ext]+"&page=" + params[:page] %>
+</p>
+
+<script language="Javascript">
+$('#img_dn').live("click", function(){
+	location.href = '/download_sharedimage?id=<%= @sharedimage.id %>';
+})
+</script>

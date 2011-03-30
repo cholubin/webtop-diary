@@ -1,0 +1,66 @@
+<% if params[:cate] != nil; cate = params[:cate] else; cate = "" end
+   if params[:folder] != nil; folder = params[:folder] else; folder = "" end
+   if params[:page] != nil; page = params[:page] else; page = "" end
+   if params[:search] != nil; search = params[:search] else; search = "" end
+   	if cate == nil or cate == "" or cate == "all"
+		cate = "all"
+		title_text = "전체"
+	else
+		title_text = Category.get(cate.to_i).name
+	end
+
+@temp = 1 
+@mytemplates.each do |my| %>
+
+<% if @temp%4 == 1%>
+
+<span><img src="images/template/line.jpg"></span>
+<table>
+	<tr>
+<%end%>		
+		<td>
+			<!-- <템플릿 정보 반복 구간입니다.> -->
+			<table class="template_table">
+				<tr><td><input type="checkbox" class="chkbox" name="chk[]" value="<%= my.id %>"></td></tr>
+				<td class="templatelist" width="180">
+					<% temp_image_path = my.thumb_url  if my.thumb_url
+						doc_name = my.id.to_s
+						link_string =  "<img title='즉시편집' border='0' src='" + my.thumb_url+"?"+ Time.now.to_f.to_s + "' onClick=\"popup('"+doc_name+"');\"; style=\"cursor:hand;\" >"
+						%>
+
+					<%= link_string  if my.thumb_url %>
+				</td>				 			
+				<td width="14">&nbsp;</td></tr>
+				<tr>
+				<td>&nbsp;</td></tr>
+				<tr> 
+				<td class="templatelist"><a href="/mytemplates/<%=my.id%>?cate=<%= cate %>&search=<%=params[:search]%>&page=<%=params[:page]%>"><%= my.name %></a></td></tr>
+				<tr> 
+				<td class="templatelist"><a href="#"><%= Category.get(my.category.to_i).name if !Category.get(my.category.to_i).nil? %><%="/"+Subcategory.get(my.subcategory.to_i).name if Subcategory.get(my.subcategory.to_i) != nil%></a></td></tr>
+				<tr>
+				<td class="templatelist">
+
+					<a href="/mytemplates/<%=my.id%>?cate=<%= cate %>&search=<%=params[:search]%>&page=<%=params[:page]%>"><img src="/images/template/edit_instant_s.jpg" border="0" title="상세보기"></a>
+					<%#= image_tag("/images/template/edit_instant_s.jpg", :border=>0, :title => "즉시편집", :onClick => "pop('/mlayout?doc_name='+doc_name)")%>
+		
+					<%= link_to image_tag("/images/template/delete_s.jpg", :border=>0, :title => "삭제"), mytemplate_path(my.id), :confirm => '정말 삭제하시겠습니까?',  :method => :delete %>
+					<%if my.order_fl == true %>
+						<img title="PDF를 생성하여 주문합니다." id="<%= my.id %>" src="/images/mytemplates/order_progress.jpg" >
+					<%else %>
+						<img title="PDF를 생성하여 주문합니다." id="<%= my.id %>" class="order_btn" src="/images/mytemplates/order_new.jpg" style="cursor:pointer;">
+					<%end %>
+							
+				</td></tr>
+				<tr>
+				<td>&nbsp;</td></tr>
+			</table>
+			<!-- <템플릿 정보 반복 구간입니다.> -->
+		</td>
+
+<% if @temp%4 == 0 or @temp == @mytemplates.length%>		
+	</tr>
+</table>
+<%end%>
+<!-- <템플릿 정보창 한줄 반복 구간입니다. -->	
+<% @temp += 1
+end%>

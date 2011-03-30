@@ -1,0 +1,158 @@
+<% 	if File.exist?(@mytemplate.preview_url)
+		temp_image_path = @mytemplate.preview_url  
+	else
+		temp_image_path = @mytemplate.thumb_url  		
+	end 
+%>
+<p5><a href="#"><%= Category.get(@mytemplate.category.to_i).name if !Category.get(@mytemplate.category.to_i).nil?%></a>
+	<% if !Subcategory.get(@mytemplate.subcategory.to_i).nil? %>
+		<a class="on" href="#">&nbsp;&nbsp;>&nbsp;<%= Subcategory.get(@mytemplate.subcategory.to_i).name %></a>  
+	<% end %>
+
+</p5>
+
+<div id="line_top3"></div>
+<div id="line_top2"></div>
+
+<%if @mytemplate.category != "현수막"%>
+
+<table>
+		<tr width="450" height="260">
+            <td width="400" class="imgmargin"><%= "<img src='" + temp_image_path+"?"+ Time.now.to_f.to_s + "'>" %></td>
+			<td width="280px">
+				<table width="250">
+					<tr>
+						<td width="250" height="35" class="table_t4" colspan="2" ><%= @mytemplate.name %></td>
+		
+					</tr>
+
+					<tr class="table_t5">
+						<td width="70" class="table_t5">등록일</td>
+						<td  width="180" class="table_t5"><%= @mytemplate.created_at.strftime('%Y-%m-%d') %></td>
+					</tr>
+	
+					<tr>
+						<td width="70" class="table_t5">가격</td>
+						<td width="180" class="table_t5_bold"><%= Temp.get(@mytemplate.temp_id).price if Temp.get(@mytemplate.temp_id) != nil %></td>
+					</tr>
+					
+					<tr>
+						<td colspan="2" width="250" class="table_t5_underline"></td>
+					</tr>
+	
+					<tr>
+						<td width="70" class="table_t5">사이즈</td>
+						<td width="180" class="table_t5"><%= Temp.get(@mytemplate.temp_id).size if Temp.get(@mytemplate.temp_id) != nil %></td>
+					</tr>
+	
+					<tr>
+						<td width="70" class="table_t5">태그</td>
+						<td width="180" class="table_t5"><%= Temp.get(@mytemplate.temp_id).tags if Temp.get(@mytemplate.temp_id) != nil %></td>
+					</tr>
+					<tr>
+						<td colspan="2" width="250" class="table_t5_underline"></td>
+					</tr>
+				</table>
+			</td>
+        </tr>
+
+</table>
+
+
+
+<%elsif @mytemplate.category == "현수막"%>
+<table>
+		<tr width="730" height="220">
+            <td class="imgmargin_banner" colspan="2"><center><%= image_tag temp_image_path %></center></td>
+        </tr>
+       
+
+		 <tr width="730" >  
+            <td width="430px">&nbsp;</td>
+
+			<td width="300" >
+					<table width="250">
+						<tr>
+							<td width="250" height="35" class="table_t4" colspan="2" ><%= @mytemplate.name %></td>
+
+						</tr>
+
+						<tr class="table_t5">
+							<td width="70" class="table_t5">등록일</td>
+							<td  width="180" class="table_t5"><%= @mytemplate.created_at.strftime('%Y-%m-%d') %></td>
+						</tr>
+
+						<tr>
+							<td width="70" class="table_t5">가격</td>
+							<td width="180" class="table_t5_bold"><%= Temp.first(:id => @mytemplate.temp_id).price if Temp.first(:id => @mytemplate.temp_id).price != nil %></td>
+						</tr>
+
+						<tr>
+							<td colspan="2" width="250" class="table_t5_underline"></td>
+						</tr>
+
+						<tr>
+							<td width="70" class="table_t5">사이즈</td>
+							<td width="180" class="table_t5"><%= Temp.first(:id => @mytemplate.temp_id).size if Temp.first(:id => @mytemplate.temp_id).size != nil %></td>
+						</tr>
+
+						<tr>
+							<td width="70" class="table_t5">태그</td>
+							<td width="180" class="table_t5"><%= Temp.first(:id => @mytemplate.temp_id).tags if Temp.first(:id => @mytemplate.temp_id).tags != nil %></td>
+						</tr>
+						<tr>
+							<td colspan="2" width="250" class="table_t5_underline"></td>
+						</tr>
+					
+					
+					</table>
+			</td>
+			<tr>
+
+		
+		</tr>
+
+</table>
+<%end%>
+
+<div id="line_bottom5"></div>	
+<table>
+	<tr>
+		<td width="727" >
+			<%if @mytemplate.order_fl == true %>
+			<img class="order_cancel_btn" id="<%= @mytemplate.id %>" src="/images/mytemplates/order_cancel.jpg" style="cursor:pointer">
+			<%end %>
+			<%= link_to image_tag("/images/board/list.jpg", :border=>0, :align => 'right'), mytemplates_path + "?page=" + params[:page] %>&nbsp;
+			<a title='복사된 템플릿의 기본정보를 수정합니다.' href="/mytemplates/<%= @mytemplate.id.to_s %>/edit?cate=<%= params[:cate] %>&page=<%= params[:page] %>"><img align="right" src="/images/board/modify.jpg" style="padding:0 2 0 2"></a>			
+			<%#= link_to image_tag("/images/template/edit.jpg", :border=>0, :align => 'right', :title => '편집기에서 템플릿을 수정합니다.'), '/mlayout?doc_name='+ @mytemplate.file_filename.gsub(/.zip/,''), :confirm => '바로 편집하시겠습니까?'%>						
+	</td>
+	</tr>
+	</table>
+	
+	
+<script Launguage="Javascript">
+$('.order_cancel_btn').live("click", function(event){
+	var $id = $(this).attr("id");
+	
+	if( window.confirm("주문을 취소하시겠습니까?")){
+		$.ajax({
+			data:'id='+$id, 
+			dataType:'script', 
+			type:'post', 
+			url:'/mytemplates/order_cancel',
+			success: function(request){
+				if(request == "success"){
+					alert("정상적으로 주문을 취소했습니다.");
+					$('#'+$id).fadeOut("slow", function(){
+						$(this).remove();
+					});
+				}else{
+					alert("주문취소 처리를 실패했습니다. 관리자에게 문의해주시기 바랍니다!");
+				}
+			}
+		});
+	}else{
+		return false;
+	}
+});
+</script>

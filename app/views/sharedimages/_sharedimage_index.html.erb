@@ -1,0 +1,303 @@
+<%
+	if params[:open] != nil and params[:open] != "" and params[:open] != "all"
+		if params[:open] == "y"
+			open = "y"
+		elsif params[:open] == "n"
+			open = "n"
+		end
+	else
+		open = "all"
+	end
+ 	
+	if params[:ext] != nil; ext = params[:ext] else; ext = "" end
+	if params[:page] != nil; page = params[:page] else; page = "" end
+	if params[:search] != nil; search = params[:search] else; search = "" end
+%>
+
+<style>
+#layer1{border:0px solid green;position:absolute; left:500px; top:200px;width:100;height:100px; z-index:99999;}
+</style>
+
+<div id="layer1" style="display:none;"><%= image_tag("/images/template/loading.gif", :width => '100') %></div>
+
+
+<script language="javascript">
+$("#del_chkbox").live("click", function(){
+	if(result() == ""){
+		alert("삭제할 이미지를 선택해주세요~");
+		return false;
+	}else{
+		if(window.confirm("선택한 이미지들을 정말 삭제하시겠습니까?")){
+			$.ajax({
+				data:'ids='+ result() + '&ext='+ $("#ext_select :selected").val(), 
+				dataType:'script', 
+				type:'post', 
+				url:'/sharedimages/deleteSelection'
+			});
+		}
+	}
+	
+})
+
+function result(){
+	var result = new Array();
+	$.each($("input[@name='chk[]']:checked"), function() {
+	  result.push($(this).val());
+	});
+	return result
+
+}
+
+
+function show_progress() {
+	var width = 100;
+	var height = 100;
+	
+	var left = (screen.width - width)/2;
+ 	var top = (screen.height - height)/2;
+	
+	document.getElementById("layer1").style.left = left;
+	document.getElementById("layer1").style.top = top;
+	
+	document.getElementById("layer1").style.display = "block";		
+
+}
+
+function hide_progress() {
+	document.getElementById("layer1").style.display = "none";		
+}
+</script>
+
+<%= stylesheet_link_tag '/css/paginate.css' %>
+	<div id="admincontents_wrapper">
+	<h2>클립아트 리스트</h2>
+	<p2>관리자가 등록한 클립아트 리스트 입니다. <br>
+		<img src="/images/mytemplates/check.jpg"/>
+		왼쪽 사이드바의 카테고리 분류를 통해 분류별로 보실 수 있으며, <br>
+		<img src="/images/mytemplates/check.jpg"/>
+		전체 리스트는 상단의 이미지 메뉴를 다시한번 클릭하시면 됩니다.
+	</p2>
+	</div>
+
+	<% 	
+		ext = params[:ext] 
+	   	if ext == nil or ext == "" or ext == "all"
+			ext = "all"
+			title_text = "전체"
+		else
+			title_text = ext.upcase
+		end
+
+	%>	
+	<div align="right" style="padding:0 24 5 0">
+		<font color="white">확장자별 </font> <select name="_ext" id="ext_select" onChange="location.href='/sharedimages?page=<%= page %>&search=<%= search %>&ext='+document.all._ext.value;">
+			<option value="all" <%= "selected" if ext == "all" %>>전체</option>				
+			<%@exts.each do |ex| %>
+				<option value="<%= ex.downcase %>" <%= "selected" if ext.downcase == ex.downcase %>><%= ex.upcase %></option>							
+			<%end %>				
+		</select>	
+	</div>
+	
+	<table class="clipart_table">
+	    <thead class="clipart_thead">
+	        <tr>
+	            <td class="clipart_thead" width="400px">관리자 공유 이미지 리스트 (<%= title_text %>)</td>
+	            <td class="clipart_thead" width="400px" align="right"></td>	
+	        </tr>
+	    </thead>
+	</table>
+<div id="sharedimage_partial">
+<% temp = 1 %>	
+<% @sharedimages.each do |sharedimage| %>
+<% if temp%4 == 1%>
+	<div>
+	<img src="/images/mytemplates/line.jpg">
+	</div>
+		<table>
+			<tr>
+<% end %>					
+				<td>
+					<!-- <템플릿 정보 반복 구간입니다.> -->
+					<table class="template_table">
+						<tr><td><input type="checkbox" id="chk_<%= sharedimage.id %>" class="chkbox" name="chk[]" value="<%= sharedimage.id %>"></td></tr>
+						<td class="templatelist" width="180">
+							<a title="<%= sharedimage.description if !sharedimage.description.nil? %>" href="/sharedimages/<%= sharedimage.id.to_s %>?ext=<%=ext%>&page=<%= params[:page] %>">
+								<img id="img_<%= sharedimage.id %>" src="<%= sharedimage.thumb_url %>">
+							</a>
+						</td>
+						<td width="14">&nbsp;</td></tr>
+						<tr>
+						<td>&nbsp;</td></tr>
+						<tr> 
+						<td class="templatelist">
+							<%
+							if sharedimage.name.length > 15
+								image_name = sharedimage.name[0,15] 
+							else  
+								image_name = sharedimage.name 
+							end  
+							%>
+							<a href="/sharedimages/<%= sharedimage.id.to_s %>?ext=<%=ext%>&page=<%= params[:page] %>"><%= image_name %></a>
+						</td></tr>
+						<!-- <tr> 
+						<td class="templatelist"><font color="white">등록일: <%= sharedimage.created_at.strftime('%Y-%m-%d') %></font></td></tr>
+						<tr> -->
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+						<td>&nbsp;</td></tr>
+					</table>
+					<!-- <템플릿 정보 반복 구간입니다.> -->
+				</td>
+<% if temp%4 == 0 or temp == @sharedimages.length%>
+			</tr>
+		</table>
+<% end  %>
+
+<% temp += 1
+end%>
+</div>
+
+<div>
+<img src="/images/mytemplates/line.jpg">
+</div>
+
+<div style="text-align:right;padding:10 50 0 0;">
+<font color="white">	
+	마이클립아트 <select id="select_copy" style="vertical-align:middle;">
+		<%Folder.all(:user_id => current_user.id).each do |f| %>
+		<option value="<%= f.name %>"><%= f.origin_name %></option>
+		<%end %>
+	</select>로 <img id="btn_copy" src="/images/sharedimage/copy.jpg" style="vertical-align:middle;cursor:pointer;"> 
+</font>
+</div>
+			<table width="776">
+				<tr height="30">
+					<td width="546">
+						<div class="pager">
+							<%= @sharedimages.pager.to_html "/sharedimages?ext=#{ext}&search=#{params[:search]}" %>
+						</div>
+					</td>
+				</tr>
+			</table>
+
+			<table width="776">
+				<tr>
+					<td align="right">
+						<% form_tag request.path + "?ext=#{ext}&page=#{params[:page]}", :method => 'get' do %>			
+						<input type="hidden" name="ext" value="<%= ext %>">
+					    <%= text_field_tag :search, params[:search] %><%= image_submit_tag("/images/board/search.jpg", :align => "absmiddle") %>	
+						<% end %>			
+
+					</td>
+				</tr>
+			</table>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<script Language="Javascript">
+	$('.share').live("click", function(){
+		var $id = $(this).attr("id").replace("share_","");
+		// $(this).attr("src","/images/share/spin.gif");
+		$.ajax({
+			data:'id='+$id, 
+			dataType:'script', 
+			type:'post', 
+			url:'/sharedimages/change_open_status',
+			success: function(request){
+				if( request == "share"){
+					$('#share_'+$id).fadeOut("slow", function(){
+						$(this).attr("src","/images/sharedimage/share_cancel.jpg");
+						$(this).attr("title","진행중인 공유를 취소합니다.");
+						$(this).fadeIn("slow")	;
+					})
+					
+				}else if (request == "cancel_share"){
+					$('#share_'+$id).fadeOut("slow", function(){
+						$(this).attr("src","/images/sharedimage/share.jpg");
+						$(this).attr("title","다른 사용자들과 자신의 이미지를 공유합니다.");
+						$(this).fadeIn("slow");
+					})
+					
+				}else{
+					alert("공유상태 변경에 실패하였습니다. 관리자에게 문의하여 주십시오.");
+				}
+			}
+		});
+	})
+	
+	$('.chkbox').live("dblclick", function(){
+		if ( $(this).attr("checked") == false ){
+
+			$('.chkbox').each(function(){
+				if($(this).attr("checked") == true ){
+					$(this).attr("checked", false);
+				}else{
+					$(this).attr("checked", true);
+				}
+			})
+
+			$(this).attr("checked", true);
+
+		}else{
+			$('.chkbox').each(function(){
+				if($(this).attr("checked") == true ){
+					$(this).attr("checked", false);
+				}else{
+					$(this).attr("checked", true);
+				}
+
+			})
+
+			$(this).attr("checked", false);
+		}
+	})
+	
+	$('#btn_copy').live("click", function(){
+		var $folder = $('#select_copy :selected').val();
+		if( $(':checkbox:checked').length > 0 ){
+			
+			$(':checkbox:checked').each(function(){
+				var $chkbox_id = $(this);
+				var $image_id = $(this).val();
+				var $image_src_origin = $('#img_'+ $image_id).attr("src");
+				$('#img_'+$image_id).fadeOut("slow", function(){
+					// $(this).attr("src","/images/admin/spin.gif");
+					$.ajax({
+						data:'folder='+$folder+'&image_id='+$image_id, 
+						dataType:'script', 
+						type:'post', 
+						url:'/sharedimages/copy_to_myclipart',
+						success: function(request){
+							if(request == "success"){
+								$('#img_'+$image_id).fadeIn("slow", function(){
+									$(this).attr("src",$image_src_origin);
+									$chkbox_id.attr("checked", false);
+									
+									if( $(':checkbox:checked').length == 0 ){
+										alert("복사가 완료되었습니다!");
+									}
+								});
+							}else{
+								alert("파일복사에 실패했습니다!\n관리자에게 문의해주세요!")
+								$('#img_'+$image_id).attr("src",$image_src_origin);
+							}
+						}
+					});
+
+
+				});
+				
+				
+			})
+			
+			
+		}else{
+			alert("먼저 복사할 이미지를 선택해주세요!");
+			return false;
+		}
+	})
+</script>

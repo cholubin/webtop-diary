@@ -1,0 +1,7 @@
+<%if @subcategories.count > 0  %>
+<select class="select_subcategory" id="select_subcategory_<%= @ebook.id %>">
+	<% @subcategories.each do |subcat| %>
+	<option value="<%= subcat.id %>"><%= subcat.name %></option>
+	<%end %>
+</select>
+<%end %>

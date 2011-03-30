@@ -1,0 +1,112 @@
+
+<div id="feature_wrapper">
+	<h2>회원정보수정</h2>
+		<p1> 비밀번호나 이메일 주소 등 기본사항에 변동사항이 있다면 꼭 마이페이지 회원정보수정에서 수정하세요.</p1>
+		<br><br>
+		<div class="error_message"><%= flash[:notice] %></div>
+	</div>
+<!-- <copy> -->
+	<div id="line_bottom1"></div>
+
+		<!-- <템플릿 정보창 한줄 반복 구간입니다. -->
+				<table>
+				<% form_for(@user) do |f| %>
+				<%= f.error_messages %>
+					<input type="hidden" name="user[userid]" value="<%= current_user.id.to_s %>">
+					<tr>
+						<td>
+							<!-- <템플릿 정보 반복 구간입니다.> -->
+							<table class="register_table">
+								<tr>
+								<td class="register_td" width="160"><img src="/images/mypage/check_empty.gif">아이디</td>
+								<td class="register_td" width="570">&nbsp;<%= current_user.userid %></td>
+								</tr>
+								<tr>
+								<td class="register_td" width="160"><img src="/images/mypage/check_empty.gif">이름</td>
+								<td class="register_td" width="570">&nbsp;<%= current_user.name %></td>
+								</tr>
+								<tr>
+								<td class="register_td" width="160"><img src="/images/mypage/check.jpg">현재 비밀번호</td>
+								<td class="register_td" width="570">
+								<input class="field_1" type="password" value="" name="user[current_password]"/></td>
+								</tr>
+								<tr>
+								<td class="register_td" width="160"><img src="/images/mypage/check.jpg">수정 비밀번호</td>
+								<td class="register_td" width="570"><input class="field_1" type="password" value="" name="user[new_password]"/></td>
+								</tr>
+
+								<tr>
+								<td width="160" class="register_td"><img src="/images/mypage/check.jpg">이메일 수정 </td>
+								<td width="100" class="register_td">
+									<input class="field_1" type="text" value="<%= @user.email %>" name="user[email]"/></td>
+								</tr>
+								<tr>
+								<td class="register_td" width="160"><img src="/images/mypage/check.jpg">전화</td>
+								<td class="register_td" width="570"><input class="field_1" type="text" value="<%= current_user.tel %>" name="user[tel]"/></td>
+								</tr>
+								<tr>
+								<td class="register_td" width="160"><img src="/images/mypage/check.jpg">모바일</td>
+								<td class="register_td" width="570"><input class="field_1" type="text" value="<%= current_user.mobile %>" name="user[mobile]"/></td>
+								</tr>
+								
+								<!-- <tr>
+								<td class="register_td" width="160"><img src="/images/mypage/check.jpg">소속합회</td>
+								<td class="register_td" width="570">
+									<select name="user[group1]">
+										<option value="연합회(기관)" <%= "selected" if current_user.group1 == "연합회(기관)" %> >연합회(기관)</option>
+										<option value="동중한합회" <%= "selected" if current_user.group1 == "동중한합회"%> >동중한합회</option>
+										<option value="서중한합회" <%= "selected" if current_user.group1 == "서중한합회"%> >서중한합회</option>
+										<option value="충청합회" <%= "selected" if current_user.group1 == "충청합회"%> >충청합회</option>
+										<option value="영남합회" <%= "selected" if current_user.group1 == "영남합회"%> >영남합회</option>
+										<option value="호남합회" <%= "selected" if current_user.group1== "호남합회" %> >호남합회</option>
+										<option value="기타" <%= "selected" if current_user.group1 == "기타"%> >기　　타</option>
+									</select></td>
+								</tr>
+								
+								<tr>
+								<td class="register_td" width="160"><img src="/images/mypage/check.jpg">소속교회</td>
+								<td class="register_td" width="570"><input class="field_1" type="text" value="<%= current_user.group2 %>" name="user[group2]"/></td>
+								</tr>
+								
+								<tr>
+								<td class="register_td" width="160"><img src="/images/mypage/check.jpg">우편물 수신장소</td>
+								<td class="register_td" width="570">교회<input type="radio" value="교회" name="user[post_spot]" <%= "checked" if current_user.post_spot == "교회" %> /> 자택<input type="radio" value="자택" name="user[post_spot]"<%= "checked" if current_user.post_spot == "자택" %>/> 직접수령<input type="radio" value="직접수령" name="user[post_spot]"<%= "checked" if current_user.post_spot == "직접수령" %> /></td>
+								</tr> -->
+								
+								<tr>
+								<td class="register_td" width="160"><img src="/images/mypage/check.jpg">우편번호</td>
+								<td class="register_td" width="570"><input class="field_1" type="text" value="<%= current_user.zip_code %>" name="user[zip_code]"/></td>
+								</tr>
+								
+								<tr>
+								<td class="register_td" width="160"><img src="/images/mypage/check.jpg">주소</td>
+								<td class="register_td" width="570">
+										<input style="width:400px;" type="text" value="<%= current_user.addr1 %>" name="user[addr1]"/><br>
+										<input style="width:400px;" type="text" value="<%= current_user.addr2 %>" name="user[addr2]"/>
+									</td>
+								</tr>
+								
+								</tr>								
+								
+
+							</table>
+							<!-- <템플릿 정보 반복 구간입니다.> -->
+						</td>
+					</tr>
+				
+				</table>
+		<!-- <템플릿 정보창 한줄 반복 구간입니다. -->
+
+
+	<div id="line_bottom1"></div>
+	
+		<table width="732">
+			<tr>
+				<td colspan="2" height="15">
+				 </tr>
+			<tr>
+				<td width="670" align="right"><a href="/"><img src="/images/mypage/cancle.jpg"></a></td>
+				<td width="62" align="right"><%= image_submit_tag("/images/mypage/confirm.jpg") %><a href="mypage_change02.html"></td>
+				</tr>
+		</table>
+		<%end%>

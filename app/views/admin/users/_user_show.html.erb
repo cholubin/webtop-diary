@@ -1,0 +1,67 @@
+<p>
+  <b>아이디:</b>
+  <%=h @user.userid %>
+</p>
+
+<p>
+  <b>이름:</b>
+  <%=h @user.name %>
+</p>
+
+<p>
+  <b>메일주소:</b>
+  <%=h @user.email %>
+</p>
+
+<p>
+  <b>소속합회:</b>
+  <%=h @user.group1 %>
+</p>
+<p>
+  <b>교회:</b>
+  <%=h @user.group2 %>
+</p>
+<p>
+  <b>연락처:</b>
+  <%=h @user.tel %> / <%=h @user.mobile %>
+</p>
+<p>
+  <b>배송처:</b>
+  <%=h @user.post_spot %>
+</p>
+<p>
+  <b>우편번호:</b>
+  <%=h @user.zip_code %>
+</p>
+
+<p>
+  <b>주소:</b>
+  <%=h @user.addr1 + " " + @user.addr2 %>
+</p>
+
+
+<%
+count_image = Myimage.all(:user_id => @user.id).count
+count_temp = Mytemplate.all(:user_id => @user.id).count
+%>
+<input type="button" value="목록" style="cursor:hand;" onClick="goList()">
+<input type="button" value="<%= @user.name %>님의 템플릿"><%= count_temp %>건
+<input type="button" value="<%= @user.name %>님의 이미지"><%= count_image %>건
+<!--
+<input type="button" value="<%= @user.name %>님의 템플릿" style="cursor:hand;" onClick="goPage('temp','<%= @user.id %>')"><%= count_temp %>건
+<input type="button" value="<%= @user.name %>님의 이미지" style="cursor:hand;" onClick="goPage('image','<%= @user.id %>')"><%= count_image %>건
+-->
+<script>
+function goList(){
+	window.location.href = "/admin/users";
+}
+
+function goPage(gubun, userid){
+	if (gubun == "temp"){
+		window.location.href = "/admin/mytemplates?userid="+userid;
+	}else if (gubun == "image"){
+		window.location.href = "/admin/myimages?userid="+userid;
+	}
+	
+}
+</script>

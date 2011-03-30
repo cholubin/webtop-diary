@@ -1,0 +1,309 @@
+
+<style>
+#layer1{border:0px solid green;position:absolute; left:500px; top:200px;width:100;height:100px; z-index:999999}
+</style>
+
+<div id="layer1" style="display:none"><%= image_tag("/images/template/loading.gif", :width => '100') %></div>
+
+<script language="javascript">
+function folder_view() {
+	var t = document.getElementById('folder');
+	
+	if (t.style.display == "none") {
+		t.style.display = "block";			
+	}else{
+		t.style.display = "none";					
+	}
+
+}
+
+function show_progress() {
+	var width = 100;
+	var height = 100;
+	
+	var left = (screen.width - width)/2;
+ 	var top = (screen.height - height)/2;
+	
+	document.getElementById("layer1").style.left = left;
+	document.getElementById("layer1").style.top = top;
+	
+	document.getElementById("layer1").style.display = "block";		
+
+}
+
+function hide_progress() {
+	document.getElementById("layer1").style.display = "none";		
+}
+
+</script>
+
+<link href="/css/paginate.css" media="screen" rel="stylesheet" type="text/css" />
+<% if params[:cate] != nil; cate = params[:cate] else; cate = "" end
+   if params[:folder] != nil; folder = params[:folder] else; folder = "" end
+   if params[:page] != nil; page = params[:page] else; page = "" end
+   if params[:search] != nil; search = params[:search] else; search = "" end
+%>
+<% 	
+   	if cate == nil or cate == "" or cate == "all"
+		cate = "all"
+		title_text = "전체"
+	else
+		title_text = Category.get(cate.to_i).name
+	end
+%>
+<div id="admincontents_wrapper" style="margin:0 0 -30 0">
+<h2>마이템플릿 리스트</h2>
+</div>
+<div align="right" style="padding:0 24 5 0">
+	<font color="white">주문상태</font> 
+	<span id="order_status_select">
+	<select name="_order_status" onChange="location.href='/mytemplates?page=1&search=<%= params[:search] %>&cate=<%= params[:cate] %>&folder=<%= params[:folder] %>&order='+document.all._order_status.value;">
+		<option value="all" <%= "selected" if params[:order] == "all" %>>전체</option>				
+		<option value="y" <%= "selected" if params[:order] == "y" %>>주문중</option>				
+		<option value="n" <%= "selected" if params[:order] == "n" %>>비주문</option>						
+	</select>
+	
+	<font color="white">폴더별 </font> 
+	<span id="folder_select">
+	<select name="_folder" onChange="location.href='/mytemplates?page=<%= page %>&search=<%= params[:search] %>&cate=<%= params[:cate] %>&order=<%= params[:order] %>&folder='+document.all._folder.value;">
+		<option value="all" <%= "selected" if params[:folder] == "all" %>>전체</option>				
+		<%@tempfolders.each do |s| %>	
+		<option value="<%= s.id %>" <%= "selected" if params[:folder] == s.id.to_s %>><%= s.name %></option>				
+		<% end %>
+	</select>
+	</span>
+	<font color="white">메인분류 </font><select name="_cate" onChange="location.href='/mytemplates?search=<%= params[:search] %>&order=<%= params[:order] %>&cate='+document.all._cate.value;">
+		<%  if @categories.length > 0 %>
+				<option value="all" <%= "selected" if cate == "all" %>>전체</option>						
+			<% @categories.each do |s| %>
+				<option value="<%= s.id %>" <%= "selected" if cate == s.id.to_s %>><%= s.name %></option>				
+			<%end%>
+		<%	else%>
+				<option value="">"먼저 메인분류를 추가하세요!"</option>					
+			<%end %>
+	</select>
+</div>
+<table class="clipart_table">
+    <thead class="clipart_thead">
+        <tr>
+            <td class="clipart_thead" width="400px">마이 템플릿 리스트 (<%= title_text %>)</td>
+			<td class="clipart_thead"   style="text-align:right"><a href="Javascript:folder_view();"><%= image_tag("/images/folder/folder_manage.jpg", :border=>'0', :align => 'absmiddle') %></a></td>
+        </tr>
+		<tr>
+			<td colspan="2">
+				<%= render :partial => "/mytemplates/folder" %>
+			</td>
+		</tr>
+    </thead>
+</table>
+<div id="partial_page">
+<%
+@temp = 1 
+@mytemplates.each do |my| %>
+
+<% if @temp%4 == 1%>
+
+<span><img src="images/template/line.jpg"></span>
+<table>
+	<tr>
+<%end%>		
+		<td>
+			<!-- <템플릿 정보 반복 구간입니다.> -->
+			<table class="template_table">
+				<tr><td>
+					<%if my.order_fl == false %>
+					<input type="checkbox" id="chk_<%= my.id %>" class="chkbox" name="chk[]" value="<%= my.id %>">
+					<%end %>
+				</td></tr>
+				<td class="templatelist" width="180">
+					<% temp_image_path = my.thumb_url  if my.thumb_url
+						doc_name = my.id.to_s
+						link_string =  "<img title='즉시편집' border='0' src='" + my.thumb_url+"?"+ Time.now.to_f.to_s + "' onClick=\"popup('"+doc_name+"');\"; style=\"cursor:hand;\" >"
+						%>
+
+					<%= link_string  if my.thumb_url %>
+				</td>				 			
+				<td width="14">&nbsp;</td></tr>
+				<tr>
+				<td>&nbsp;</td></tr>
+				<tr> 
+				<td class="templatelist"><a href="/mytemplates/<%=my.id%>?cate=<%= cate %>&search=<%=params[:search]%>&page=<%=params[:page]%>"><%= my.name %></a></td></tr>
+				<tr> 
+				<td class="templatelist"><a href="#"><%= Category.get(my.category.to_i).name if !Category.get(my.category.to_i).nil? %><%="/"+Subcategory.get(my.subcategory.to_i).name if Subcategory.get(my.subcategory.to_i) != nil%></a></td></tr>
+				<tr>
+				<td class="templatelist">
+
+					<a href="/mytemplates/<%=my.id%>?cate=<%= cate %>&search=<%=params[:search]%>&page=<%=params[:page]%>"><img src="/images/template/edit_instant_s.jpg" border="0" title="상세보기"></a>
+					<%#= image_tag("/images/template/edit_instant_s.jpg", :border=>0, :title => "즉시편집", :onClick => "pop('/mlayout?doc_name='+doc_name)")%>
+					
+					<%if my.order_fl == false %>
+						<%= link_to image_tag("/images/template/delete_s.jpg", :id => "del_#{my.id}", :border=>0, :title => "삭제"), mytemplate_path(my.id), :confirm => '정말 삭제하시겠습니까?',  :method => :delete %>
+					<%end %>
+					<%if my.order_fl == true %>
+						<img title="PDF를 생성하여 주문합니다." id="<%= my.id %>" src="/images/mytemplates/order_progress.jpg" >
+					<%else %>
+						<img title="PDF를 생성하여 주문합니다." id="<%= my.id %>" class="order_btn" src="/images/mytemplates/order_new.jpg" style="cursor:pointer;">
+					<%end %>
+							
+				</td></tr>
+				<tr>
+				<td>&nbsp;</td></tr>
+			</table>
+			<!-- <템플릿 정보 반복 구간입니다.> -->
+		</td>
+
+<% if @temp%4 == 0 or @temp == @mytemplates.length%>		
+	</tr>
+</table>
+<%end%>
+<!-- <템플릿 정보창 한줄 반복 구간입니다. -->	
+<% @temp += 1
+end%>
+</div>
+
+<% if @mytemplates.count > 0 %>
+<table class="clipart_table2">
+    <thead>
+        <tr>
+			<tr><td colspan="2"><div id="line_bottom2"></div></td></tr>
+            <td class="clipart_thead_bottom" width="400px">&nbsp;</td>
+			<td class="clipart_thead_bottom" width="350" align="right">
+				<% if @mytemplates.count > 0 %>
+				<%= image_tag '/images/board/delete.jpg', :align => 'absmiddle', 
+				:onmouseover => "this.style.cursor='hand';",
+				:onclick => "
+				if( $(':checkbox:checked').length > 0){
+					if (window.confirm('선택하신 파일을 정말 삭제하시겠습니까?')){
+
+					}else{
+						return false;
+					};
+				}else{
+					alert('먼저 삭제할 대상을 선택해주세요!');
+					return false;
+				}" + remote_function(:url => { :controller => 'mytemplates', :action => :deleteSelection },
+				:with => "'temp_id=' + result()")
+				%>
+				<% end %>
+			</td>
+        </tr>
+		<tr>
+			<td colspan="2">
+				<%= render :partial => "/mytemplates/folder" %>
+			</td>
+		</tr>
+    </thead>
+</table>
+<% end %>
+<!-- dm-pager Pagination -->
+<table width="780" >
+	<% form_tag request.path + "?page=#{params[:page]}", :method => 'get' do %>			
+	<input type="hidden" name="cate" value="<%= cate %>">
+		<tr>
+			<td width="350">
+				<div class="pager">
+					<%= @mytemplates.pager.to_html "/Mytemplates?order=#{params[:order]}&cate=#{params[:cate]}&folder=#{params[:folder]}&search=#{params[:search]}" %>
+					</div></td>
+			<td width="230"></td>
+			<td width="150"></td>
+		</tr>
+	
+		<tr height="10">
+			<td colspan="3" align="right">
+				
+				    <%= text_field_tag :search, params[:search] %><%= image_submit_tag("/images/board/search.jpg", :border=>'0', :align => "absmiddle") %>	
+			</td>
+		</tr>
+	<% end %>			
+</table>
+
+<script language="javascript">
+
+$('.order_btn').live("click", function(event){
+	var $id = $(this).attr("id");
+	
+	if( window.confirm("주문하시겠습니까? \n주문후에는 편집을 하실 수 없습니다!")){
+		$.ajax({
+			data:'id='+$id, 
+			dataType:'script', 
+			type:'post', 
+			url:'/mytemplates/order_process',
+			success: function(request){
+				if(request == "success"){
+					alert("정상적으로 주문처리 하였습니다.\n상세페이지에서 주문을 취소하시면 다시 편집하실 수 있습니다.");
+					$('#'+$id).attr("src","/images/mytemplates/order_progress.jpg").attr("title","현재 주문 진행중이기 때문에 편집하실 수 없습니다.").removeClass("order_btn").css("cursor", "default");
+					$('#chk_'+$id).fadeOut("slow", function(){
+						$(this).remove();
+					})
+					$('#del_'+$id).fadeOut("slow", function(){
+						$(this).remove();
+					})
+				}else{
+					alert("주문처리를 실패했습니다. 관리자에게 문의해주시기 바랍니다!");
+				}
+			}
+		});
+	}else{
+		return false;
+	}
+});
+
+ function popup(doc_name) {
+		$.ajax({
+			data:'id='+doc_name, 
+			dataType:'script', 
+			type:'post', 
+			url:'/mytemplates/order_check',
+			success: function(request){
+				if(request == "in_order"){
+					alert("현재 주문 진행중이기 때문에 삭제하거나 편집하실 수 없습니다.\n상세페이지에서 주문을 취소하시면 다시 삭제하거나 편집하실 수 있습니다.");
+				}else{
+					// var url = '/mlayout?doc_name='+doc_name;
+					   var url = "/MClientBox/index.html?spread_list=YES&user_path=/user_files/<%= current_user.userid %>&doc_path=/article_templates/"+ doc_name+".mlayoutP"
+					   width = screen.width;
+					   height = screen.height;
+				      window.open(url ,'webtop_print','width='+width+', height='+height);
+				}
+			}
+		});
+		
+       
+}
+
+function result(){
+	var result = new Array();
+	$.each($("input[@name='chk[]']:checked"), function() {
+	  result.push($(this).val());
+	});
+	return result
+
+}
+
+$('.chkbox').live("dblclick", function(){
+	if ( $(this).attr("checked") == false ){
+
+		$('.chkbox').each(function(){
+			if($(this).attr("checked") == true ){
+				$(this).attr("checked", false);
+			}else{
+				$(this).attr("checked", true);
+			}
+		})
+
+		$(this).attr("checked", true);
+
+	}else{
+		$('.chkbox').each(function(){
+			if($(this).attr("checked") == true ){
+				$(this).attr("checked", false);
+			}else{
+				$(this).attr("checked", true);
+			}
+
+		})
+
+		$(this).attr("checked", false);
+	}
+})
+
+</script>
