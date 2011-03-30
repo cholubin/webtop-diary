@@ -6,15 +6,15 @@
 	<div id="nav_container">
 		<ul id="nav">
 			<li><a <%= "Class=\"on\"" if @menu == "home" %> href="/">홈</a></li>
-			<li><a <%= "Class=\"on\"" if @menu == "about" %> href="/pages/about">about</a></li>
-			<li><a <%= "Class=\"on\"" if @menu == "template" %> href="/temps">template</a></li>
-			<li><a <%= "Class=\"on\"" if @menu == "board" %> href="/notices">board</a></li>
-			<li><a <%= "Class=\"on\"" if @menu == "sharedimage" %> href="/sharedimages">images</a></li>
+			<li><a <%= "Class=\"on\"" if @menu == "about" %> href="/pages/about">About</a></li>
+			<li><a <%= "Class=\"on\"" if @menu == "template" %> href="/temps">템플릿</a></li>
+			<li><a <%= "Class=\"on\"" if @menu == "board" %> href="/notices">게시판</a></li>
+			<li><a <%= "Class=\"on\"" if @menu == "sharedimage" %> href="/sharedimages">이미지</a></li>
 			<!-- <li><a <%= "Class=\"on\"" if @menu == "ebook" %> href="/ebooks">ebooks</a></li>			 -->
 			<!-- <li><a <%= "Class=\"on\"" if @menu == "tutorial" %> href="/pages/tutorial">tutorial</a></li> -->
 <!--			<li><a <%= "Class=\"on\"" if @menu == "contact" %>href="/pages/contact">contact</a></li> -->
 			<% if signed_in? %>
-			<li id="myspace" title="TEMPLATE 페이지에서 복사한 자신의 템플릿을 편집하고 관리하는 영역입니다."><a <%= "Class=\"on\"" if @menu == "mytemplate" %> href="/mytemplates">My Space</a></li>						
+			<li id="myspace" title="TEMPLATE 페이지에서 복사한 자신의 템플릿을 편집하고 관리하는 영역입니다."><a <%= "Class=\"on\"" if @menu == "mytemplate" %> href="/mytemplates">나의 작업영역</a></li>						
 				<% if @menu == "mlayout" %>
 					<li ><a <%= "Class=\"on\"" if @menu == "mlayout" %> href="#">Edit</a></li>							
 				<% end %>
