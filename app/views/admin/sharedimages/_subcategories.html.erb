@@ -1,5 +1,5 @@
-<select class="select_subcategory" id="select_subcategory_<%= @sharedimage.id %>">
-	<% @subcategories.each do |subcat| %>
+<select class="select_subcategory" id="select_subcategory_<%= @sharedimage.id if @sharedimage != nil %>">
+	<%@subcategories.each do |subcat| %>
 	<option value="<%= subcat.id %>"><%= subcat.name %></option>
 	<%end %>
 </select>

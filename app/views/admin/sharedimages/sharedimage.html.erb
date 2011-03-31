@@ -1,3 +1,7 @@
+<script type="text/javascript" src="/js/other/multifile_compressed.js"></script>
+
+</head>
+
 	<div id="admincontents_wrapper">
 		<!-- <top 메뉴입니다.> -->
 	<div id="admin">
@@ -32,7 +36,7 @@
 				<div class="box">
 						<div id="admin_contents">
 							<div id="admincontents_wrapper">
-								<%= render :partial => "/admin/sharedimages/#{@board}_#{@section}" %>
+								<%= render :partial => "/admin/sharedimages/#{@board}_#{@section}", :object => @subcategories %>
 							</div>
 						</div>
 					</div>

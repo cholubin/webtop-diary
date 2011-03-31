@@ -74,6 +74,7 @@ class Admin::ImgcategoriesController < ApplicationController
       @category = Category.get(params[:imgcategories][:main_category].to_i)
       @sub_category = @category.subcategories.new
       @sub_category.name = params[:imgcategories][:sub_name]
+      @sub_category.gubun = "image"
       @sub_category.priority = params[:imgcategories][:sub_priority].to_i
 
       if @sub_category.save

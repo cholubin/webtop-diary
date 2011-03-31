@@ -61,9 +61,15 @@ class Admin::SharedimagesController < ApplicationController
     @board = "sharedimage"
     @section = "new"
   
-    @categories = Category.all(:gubun => "image", :order => :priority)    
-    @subcategories = Subcategory.all(:gubun => "image",:order => :priority)
-  
+    @categories = Category.all(:gubun => "image", :order => :priority)
+    
+    if @categories.count > 0 
+      @subcategories = Subcategory.all(:category_id => @categories.first().id, :order => :priority)
+    else
+      @subcategories = Subcategory.all(:gubun => "image",:order => :priority)
+    end
+    
+    
     @sharedimage = Sharedimage.new
       
     render 'sharedimage'
@@ -82,9 +88,84 @@ class Admin::SharedimagesController < ApplicationController
     render 'myimage'    
   end
 
-  # POST /myimages
-  # POST /myimages.xml
+
   def create
+    @menu = "board"
+    @board = "sharedimage"
+    
+    # file_max_num = params[:file_max_num].to_i
+    
+    # 이미지 업로드 처리 ===============================================================================
+    files = [params[:file_0],params[:file_1],params[:file_2],params[:file_3],params[:file_4],params[:file_5]]
+    
+    if params[:file_0] != nil
+
+      files.each do |n|
+        if n != nil and n != ""
+           @sharedimage = Sharedimage.new(params[:sharedimage])
+
+           image_path = @sharedimage.image_path
+           SharedimageUploader.store_dir = @sharedimage.image_path
+
+           @sharedimage.image_file = n     
+
+
+           ext_name = File.extname(n.original_filename)      
+           file_name = n.original_filename.gsub(ext_name,'')
+
+           @sharedimage.save
+
+           if ext_name == ".eps" or ext_name == ".pdf"
+            @sharedimage.image_thumb_filename = @sharedimage.id.to_s + ".png"
+           else
+            @sharedimage.image_thumb_filename = @sharedimage.id.to_s + ".jpg"
+           end
+
+           @sharedimage.type = ext_name.gsub(".",'').downcase 
+           @sharedimage.name = file_name
+
+          if @sharedimage.save  
+            ext_name_up = @sharedimage.type
+            file_name_up = @sharedimage.id.to_s
+
+            filename = file_name_up + "." + ext_name_up
+
+            if  File.exist?(image_path + "/" + filename)
+              image_folder = "#{RAILS_ROOT}" + "/public/sharedimage"
+              if ext_name_up == "eps" or ext_name_up == "pdf"
+               puts %x[#{RAILS_ROOT}"/lib/thumbup" #{image_folder + "/" + filename} #{image_folder + "/preview/" + file_name_up + ".png"} 0.5 #{image_folder + "/thumb/" + file_name_up + ".png"} 128]            	  
+              else
+               puts %x[#{RAILS_ROOT}"/lib/thumbup" #{image_folder + "/" + filename} #{image_folder + "/preview/" + file_name_up + ".jpg"} 0.5 #{image_folder + "/thumb/" + file_name_up + ".jpg"} 128]            	  
+              end
+            end
+            
+          else
+            puts_message @sharedimage.errors.to_s
+            @section = "new"
+            # render 'sharedimage'
+          end
+        end
+      end
+      
+      # image filename renaming ======================================================================
+      @sharedimages = Sharedimage.all(:order => [:created_at.desc]).search_user(params[:search], params[:page])   
+      @total_count = @sharedimages.count
+      @exts = repository(:default).adapter.select('SELECT distinct type FROM sharedimages')
+
+      redirect_to admin_sharedimages_url, :object=>@sharedimages, :object=>@total_count
+      
+      
+    else
+          flash[:notice] = '이미지는 반드시 선택하셔야 합니다.'      
+          @section = "new"
+          render 'sharedimage'
+    end
+      
+
+  end
+  
+  
+  def create_old
     @menu = "board"
     @board = "sharedimage"
     
@@ -356,13 +437,10 @@ class Admin::SharedimagesController < ApplicationController
    
    def update_subcategories
         categories = Category.get(params[:category_id].to_i)
-        subcategories = categories.subcategories.all(:order => :priority)
-
-        puts_message subcategories.count.to_s
-        # puts subcategories.inspect
+        @subcategories = categories.subcategories.all(:order => :priority)
 
         render :update do |page|
-          page.replace_html 'subcategories', :partial => 'subcategories', :object => subcategories
+          page.replace_html 'subcategories', :partial => 'subcategories', :object => @subcategories
         end
     end
   
@@ -379,7 +457,7 @@ class Admin::SharedimagesController < ApplicationController
       
       puts_message @subcategories.count.to_s
       # puts subcategories.inspect
-
+            
       render :update do |page|
         page.replace_html 'subcategories_'+ params[:id], :partial => 'subcategories', :object => @subcategories, :object => @sharedimage
       end
