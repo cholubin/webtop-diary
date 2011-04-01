@@ -97,8 +97,16 @@ class Admin::SharedimagesController < ApplicationController
     
     # 이미지 업로드 처리 ===============================================================================
     files = [params[:file_0],params[:file_1],params[:file_2],params[:file_3],params[:file_4],params[:file_5]]
+    files = []
+    100.times do |t|
+      if params["file_#{t}"] != nil and params["file_#{t}"] != ""
+        files << params["file_#{t}"]
+      end
+    end
     
-    if params[:file_0] != nil
+    total_file_num = files.length
+    
+    if total_file_num > 0
 
       files.each do |n|
         if n != nil and n != ""

@@ -20,22 +20,37 @@
 	<br><br>
 	
 	<!-- The file element -- NOTE: it has an ID -->
-	<input id="my_file_element" type="file" name="file" >
+	<input id="my_file_element" type="file" name="file">
 	<%= f.submit '이미지 업로드' %>
 <%end %>
 <!-- </form> -->
-Files: 총5개 까지 선택하시 수 있습니다!
+
 <!-- This is where the output will appear -->
-<div id="files_list" style="background-color: BDBDBD;"></div>
+<div id="files_list" class="ui-state-highlight ui-corner-all" style="width:400;margin-top: 20px; padding: 0 .7em;">
+	<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span><font color=blue>Files: 총<span id="max_num"></span>개 까지 선택하시 수 있습니다!</font></p>
+</div>
 <script>
-	var file_max_num = 5;
+	var file_max_num = 10;
+	$('#max_num').text(file_max_num);
 	$('#file_max_num').val(file_max_num);
 	<!-- Create an instance of the multiSelector class, pass it the output target and the max number of files -->
 	var multi_selector = new MultiSelector( document.getElementById( 'files_list' ), file_max_num );
 	<!-- Pass in the file element -->
 	multi_selector.addElement( document.getElementById( 'my_file_element' ) );
+	
 </script>
 
+<script language="Javascript">
+$('#sharedimage_submit').click(function(){
+	$imgFile = $('input:file');
+	if ($imgFile.length < 2){
+		alert("이미지 파일을 선택해주세요!");
+		return false;
+	}
+	
+})
+</script>
 
 <%= link_to '목록', "/admin/sharedimages" %>
+
 
